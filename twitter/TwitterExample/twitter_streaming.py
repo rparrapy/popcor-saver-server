@@ -13,7 +13,7 @@ consumer_key = "cV1w6r6z6w9eEfpwDt1xiWFQg"
 consumer_secret = "2wGLylL0GiFeUwUbw9gBfvblLlYNRfz78aQbXTeHuSrUOJxPPD"
 start_time = time.time()  # grabs the system time
 #keyword_list = ['best action movie', 'action movie', 'must see movie', 'great movie', 'new movie']  # track list
-keyword_list = ['avengers']
+keyword_list = ['Jupiter Ascending movie', 'Jupiter Ascending', '#JupiterAscending']
 file_name = None
 
 class Listener(StreamListener):
@@ -57,5 +57,5 @@ if __name__ == '__main__':
 
     auth = OAuthHandler(consumer_key, consumer_secret)  # OAuth object
     auth.set_access_token(access_token, access_token_secret)
-    twitterStream = Stream(auth, Listener(time_limit=10))  # initialize Stream object with a time out limit
+    twitterStream = Stream(auth, Listener(time_limit=30))  # initialize Stream object with a time out limit
     twitterStream.filter(track=keyword_list, languages=['en'])  # call the filter method to run the Stream Object
