@@ -66,7 +66,7 @@ def _process_movie(m, links):
     m['genres'] = m['genres'].split('|')
     year_regex = re.search(r"(\([0-9]+\))", m['title'])
     if year_regex is not None:
-        m['year'] = int(year_regex.groups()[0])
+        m['year'] = int(year_regex.groups()[0][1:-1])
     return m
 
 
