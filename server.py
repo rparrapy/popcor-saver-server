@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from flask import Flask, request, jsonify
 from elasticsearch import Elasticsearch
-from loader import load_movies
+from loader import load_elasticsearch, load_mongodb
 
 __author__ = 'rparra'
 es = Elasticsearch()
@@ -15,15 +15,21 @@ def index():
 
 
 @app.route('/movies', methods=['GET', 'POST'])
-def movies(q=None):
+def movies():
+    result = None
     if request.method == 'POST':
-        return jsonify(load_movies())
+        dest = request.form.get('dest')
+        if dest == 'ES':
+            result = jsonify(load_elasticsearch())
+        elif dest == 'MONGO':
+            result = jsonify(load_mongodb())
     else:
-        return 'Please search directly in ES'
+        result = 'Please search directly in ES'
+    return result
 
 
-@app.route('/recommendations')
-def recommendations(q=None, methods=['GET', 'POST']):
+@app.route('/recommendations', methods=['GET', 'POST'])
+def recommendations():
     if request.method == 'POST':
         return 'TODO: load recommendations to elasticsearch'
     else:
@@ -31,15 +37,15 @@ def recommendations(q=None, methods=['GET', 'POST']):
 
 
 @app.route('/trends', methods=['GET', 'POST'])
-def trends(q=None):
+def trends():
     if request.method == 'POST':
         return 'TODO: load trends to elasticsearch'
     else:
         return 'List of trends'
 
 
-@app.route('/quotes')
-def quotes(q=None, methods=['POST']):
+@app.route('/quotes', methods=['POST'])
+def quotes():
     return 'TODO: load quotes to elasticsearch'
 
 
