@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 from flask import Flask, request, jsonify
 from elasticsearch import Elasticsearch
+from flask_cors import CORS
 from loader import load_elasticsearch, load_mongodb
 
 __author__ = 'rparra'
 es = Elasticsearch()
 app = Flask(__name__)
 app.debug = True
-
+CORS(app)
 
 @app.route('/')
 def index():
@@ -33,6 +34,7 @@ def recommendations():
     if request.method == 'POST':
         return 'TODO: load recommendations to elasticsearch'
     else:
+        ratings = request.args.get('ratings')
         return 'List of recommendations'
 
 
