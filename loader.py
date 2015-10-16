@@ -43,9 +43,24 @@ def load_mongodb():
             users[r['userId']] = {'userId': r['userId'], 'ratings': [user_rating]}
         return users
 
+    def _process_rating(r):
+        result = {}
+        result['user_id'] = long(r['userId'])
+        result['item_id'] = long(r['movieId'])
+        result['preference'] = float(r['rating'])
+        result['created_at'] = long(r['timestamp'])
+        return result
+
     users = _read_csv(base_path + 'ratings.csv', lambda r: reduce(_get_user_list, r, {}), is_reduce=True)
     users_result = db['users'].insert_many(users.values())
-    return {'movies': len(movies_result.inserted_ids), 'users': len(users_result.inserted_ids)}
+
+    ratings = _read_csv(base_path + 'ratings.csv', lambda r: _process_rating(r))
+    ratings_result = db['ratings'].insert_many(ratings)
+    return {
+        'movies': len(movies_result.inserted_ids),
+        'users': len(users_result.inserted_ids),
+        'ratings': len(ratings_result.inserted_ids)
+    }
 
 
 def _process_links():
@@ -66,7 +81,7 @@ def _process_movie(m, links):
     m['genres'] = m['genres'].split('|')
     year_regex = re.search(r"(\([0-9]+\))", m['title'])
     if year_regex is not None:
-        m['year'] = int(year_regex.groups()[0])
+        m['year'] = int(year_regex.groups()[0][1:-1])
     return m
 
 
