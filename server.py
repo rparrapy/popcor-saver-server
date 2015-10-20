@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from flask import Flask, request, jsonify
 from elasticsearch import Elasticsearch
-from loader import load_movies
+from loader import load_movies,  load_quotes
 
 __author__ = 'rparra'
 es = Elasticsearch()
@@ -38,9 +38,10 @@ def trends(q=None):
         return 'List of trends'
 
 
-@app.route('/quotes')
-def quotes(q=None, methods=['POST']):
-    return 'TODO: load quotes to elasticsearch'
+@app.route('/quotes', methods=['POST'])
+def quotes(q=None):
+        return jsonify(load_quotes())
+    
 
 
 if __name__ == "__main__":

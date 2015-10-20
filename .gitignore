@@ -60,3 +60,4 @@ static/csv
 
 #IDE files
 .idea
+pip-selfcheck.json
