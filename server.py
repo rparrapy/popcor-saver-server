@@ -1,11 +1,7 @@
 #!/usr/bin/env python
 from flask import Flask, request, jsonify
-from flask_cors import CORS
-from loader import load_elasticsearch, load_mongodb
-from pymongo import MongoClient
-
-client = MongoClient()
-db = client['popcorn-saver']
+from elasticsearch import Elasticsearch
+from loader import load_movies
 
 __author__ = 'rparra'
 app = Flask(__name__)
@@ -40,9 +36,9 @@ def trends():
         return 'List of trends'
 
 
-@app.route('/quotes', methods=['POST'])
-def quotes():
-    return 'TODO: load quotes to elasticsearch'
+@app.route('/quotes')
+def quotes(q=None, methods=['POST']):
+    return return jsonify(load_quotes())
 
 
 @app.route('/ratings', methods=['POST', 'DELETE'])
