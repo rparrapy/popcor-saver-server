@@ -1,10 +1,19 @@
 #!/usr/bin/env python
+import json
+import codecs
 from elasticsearch import Elasticsearch
+from pymongo import MongoClient
 import csv
+import re
+from fuzzywuzzy import fuzz
+import sys
 
 __author__ = 'rparra'
 es = Elasticsearch()
 
+client = MongoClient()
+db = client['popcorn-saver']
+base_path = 'static/csv/'
 
 
 def load_elasticsearch():
@@ -92,26 +101,25 @@ def _read_csv(path, func=None, is_reduce=False):
             result = map(func, reader)
     return result
 
+
 def load_quotes():
     base_path = 'static/csv/'
-    result ={}
+    result = {}
     c = 0
     with open(base_path + 'movies.csv', 'rU') as csvfile:
         csvreader = csv.reader(csvfile)
         for row in csvreader:
-                title_csv = row[1][0:len(row[1])-6]
-                id_csv = row[0]
-                quote_list = []
-                with open(base_path + 'what.json', 'r') as f:
-                    quote_list = json.loads(f.read())
-                    for q in quote_list:
-                        if len(q['quotes'])>2:
-                            ratio = fuzz.ratio( q['title'], title_csv)
-                            if ratio > 90:
-                                c = c + 1
-                                movies=es.get(index='popcorn-saver', doc_type='movie', id=id_csv)
-                                movies['quotes']=q['quotes']
-                                es.index(index='popcorn-saver', doc_type='movie', id=id_csv, body=movies)
+            title_csv = row[1][0:len(row[1]) - 6]
+            id_csv = row[0]
+            quote_list = []
+            with codecs.open(base_path + 'what.json', 'r', encoding='utf-8') as f:
+                quote_list = json.loads(f.read())
+                for q in quote_list:
+                    if len(q['quotes']) > 2:
+                        ratio = fuzz.ratio(q['title'], unicode(title_csv, 'utf-8'))
+                        if ratio > 90:
+                            c = c + 1
+                            indexed_movie = es.get(index='popcorn-saver', doc_type='movie', id=id_csv)
+                            indexed_movie['_source']['quotes'] = q['quotes']
+                            es.index(index='popcorn-saver', doc_type='movie', id=id_csv, body=indexed_movie['_source'])
     return {'success': c}
-
-
